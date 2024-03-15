@@ -110,3 +110,16 @@ let Product = function(ID, name, description, price, brand, quantity){
         return sum/reviews.size/4;
     }
 }
+
+
+let Review = function(ID, author,data, comment,rating){
+    this.ID = ID;
+    this.author = author;
+    this.data = data;
+    this.comment = comment;
+    this.rating = rating;
+}
+
+
+
+let pr = new Product(0,"name","description","price","brand",12);
