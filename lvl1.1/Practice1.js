@@ -17,7 +17,7 @@ let Product = function(ID, name, description, price, brand, quantity){
         return name;
     }
     this.getDescription = function(){
-        return description;
+        return this.description;
     }
     this.getPrice = function(){
         return price;
@@ -123,24 +123,72 @@ let Review = function(ID, author,data, comment,rating){
 }
 
 
+let products =[];
+products[0] = new Product(0,"name","description",1000,"brand",12);
+products[1] = new Product(2,"футбол","123 123 name",3,"brand",12);
+products[2] = new Product(7,"футболка","description",5,"brand",12);
+products[3] = new Product(1,"123","123 123 футболка",6666666666,"brand",12);
+products[4] = new Product(4,"name","1 футбол ",1,"brand",12);
 
-let pr = new Product(0,"name","description","price","brand",12);
 
-pr.setDate(new Date);
-pr.setActiveSize('S');
-let rating = [];
-rating['service'] = 5;
-rating['price'] = 3;
-rating['value'] = 4;
-rating['quality'] = 1;
+function searchProduct(products, search){
+    
+    if(search.endsWith("*")){
+      search = search.slice(0,-1);
+      return getStart(products,search);
+    }
+    return getFull(products, search);
+}
+function getStart(products, search){
+    let pr =[];
+    products.forEach(product => {
+        if(product.getName().startsWith(search)){
+            pr.push(product);
+            return;
+        }
+        let words = product.getDescription().split(" ");
+        
+        for(let id in words){
+            if(words[id].startsWith(search)){
+                pr.push(product);
+                break;
+            }
+        }
+    });
+    return pr;
+}
+function getFull(products, search){
+    let pr =[];
+    products.forEach(product => {
+        if(product.getName() == search){
+            pr.push(product);
+            return;
+        }        
+        let description = product.getDescription();
+        let words = description.split(" ");
+        for(let id in words){
+            if(words[id] == search){
+                pr.push(product);
+                break;
+            }
+        }
+    });
+    return pr;
+}
+console.log(searchProduct(products,"футбол*"));
 
-let review = new Review(0,"me",new Date,"blablabla",rating);
-pr.addReview(review);
-console.log(pr.reviews);
-console.log("review "+pr.getReviewByID(0).comment);
-pr.addSize("XXXL");
-pr.deleteSize("XXL");
-console.log("Everage: "+pr.getAverageRating());
-console.log(pr.sizes);
-pr.deleteReview(0);
-console.log(pr.reviews);
+
+function sort(products,sortRule){
+    return products.sort(function(a, b) {
+        if (a[sortRule] < b[sortRule]) {
+            return -1;
+        }
+        if (a[sortRule] > b[sortRule]) {
+            return 1;
+        }
+        return 0; 
+    });
+}
+console.log(sort(products,"name"));
+console.log(sort(products,"name"));
+
