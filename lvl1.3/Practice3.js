@@ -22,14 +22,32 @@ class AbstractProduct{
 
     }
 
-
     propertyAccessor(propertyName, value) {
         if (typeof value !== 'undefined') {
-            this[propertyName] = value;
+            // Встановлення значення властивості
+            switch (propertyName){
+                case 'name':this.#name = value;break;
+                case 'description':this.#description = value;break;
+                case 'amount':this.#amount = value;break;
+                case 'price':this.#price = value;break;
+                case 'brand':this.#brand = value;break;
+            }
         } else {
-            return this[propertyName];
+            switch (propertyName){
+                case 'name': return this.#name;
+                case 'description':return this.#description
+                case 'amount': return this.#amount 
+                case 'price':return this.#price 
+                case 'brand':return this.#brand
+                case 'reviews':return this.#reviews
+                case 'images':return this.#images
+                case 'date':return this.#date
+                case 'id': return this.#ID;
+            }
         }
     }
+
+
     getFullInformation(){
         let info = "";
         info+="ID: "+this.#ID+"\n";
@@ -105,7 +123,7 @@ class Clothes extends AbstractProduct{
 
 }
 
-class Electronics{
+class Electronics extends AbstractProduct{
     #warranty
     #power
     constructor(id,name,description,price,amount,review,images,date,brand,warranty, power){
@@ -127,6 +145,64 @@ class Electronics{
     }
 }
 
+function sort(products,sortRule){
+    return products.sort(function(a, b) {
+        if (a.propertyAccessor(sortRule) < b.propertyAccessor(sortRule)) {
+            return -1;
+        }
+        if (a.propertyAccessor(sortRule) > b.propertyAccessor(sortRule)) {
+            return 1;
+        }
+        return 0; 
+    });
+}
+
+function getStart(products, search){
+    let pr =[];
+    products.forEach(product => {
+        if(product.propertyAccessor("name").startsWith(search)){
+            pr.push(product);
+            return;
+        }
+        let words = product.propertyAccessor("description").split(" ");
+        
+        for(let id in words){
+            if(words[id].startsWith(search)){
+                pr.push(product);
+                break;
+            }
+        }
+    });
+    return pr;
+}
+function getFull(products, search){
+    let pr =[];
+    products.forEach(product => {
+        if(product.propertyAccessor("name") == search){
+            pr.push(product);
+            return;
+        }        
+        let description = product.propertyAccessor("description") ;
+        let words = description.split(" ");
+        for(let id in words){
+            if(words[id] == search){
+                pr.push(product);
+                break;
+            }
+        }
+    });
+    return pr;
+}
+
+
+function searchProduct(products, search){
+    
+    if(search.endsWith("*")){
+      search = search.slice(0,-1);
+      return getStart(products,search);
+    }
+    return getFull(products, search);
+}
 
 
 class Review{
@@ -143,3 +219,28 @@ class Review{
         rating = rating;
     }
 }
+
+
+
+
+let products =[];
+products[0] = new Clothes(0,"name","description",1000,"brand",12);
+products[1] = new Clothes(2,"футбол","123 123 name",3,"brand",12);
+products[2] = new Clothes(7,"футболка","description",5,"brand",12);
+products[3] = new Clothes(1,"123","123 123 футболка",6666666666,"brand",12);
+products[4] = new Clothes(4,"name","1 футбол ",1,"brand",12);
+
+console.log(products[0].propertyAccessor('name'));
+console.log(searchProduct(products,"футбол*"));
+
+console.log(sort(products,"id"));
+
+
+function Hello() {
+    this.message = "world";
+    return "hey"
+  }
+  
+  // не запускай, спочатку подумай)
+  console.log(Hello())
+  console.log(new Hello())
