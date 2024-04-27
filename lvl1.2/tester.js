@@ -32,7 +32,7 @@ Content-Length: 35
 
 login=student&password=12345
 `,
-    5: `GET / HTTP/1.1
+    5: `GET /hello/test.txt HTTP/1.1
 Host: student.shpp.me
 Accept: image/gif, image/jpeg, */*
 Accept-Language: en-us

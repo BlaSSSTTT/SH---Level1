@@ -55,43 +55,57 @@ function readHttpLikeInput(){
    function processHttpRequest($method, $uri, $headers, $body) {
        let statusCode = 200;
        let statusMessage = "OK";       
-       $body = "not found";
-       $headers = "Date: "+getCurrentDateFormatted()+"\n"+
-                        "Server: Apache/2.2.14 (Win32)\n"+
-                        "Content-Length: " + $body.length+"\n"+
-                        "Connection: Closed\n"+
-                        "Content-Type: text/html; charset=utf-8\n";
        if($method!=="GET"){
             statusCode=400;
             statusMessage = "Bad Request";
-       }else if(!$uri.startsWith("/sum")){
-            statusCode=404;
-            statusMessage = "Not Found";
-       }else if(!$uri.startsWith("/sum?nums=")){
-            statusCode=400;
-            statusMessage = "Bad Request";
-        }else{
-            url = url.replace("/sum?nums=", '');
-            let nums = url.split(",");
-            $body = 0;
-            for (let i = 0; i < nums.length; i++) {
-                $body += parseInt(nums[i]);
+            $body = "not found";
+       }else {
+            let hostString = $headers.find(str => str.startsWith("Host")).replace("Host: ", "");
+            let path="";
+            if(hostString.startsWith("student.shpp.me")){
+                path = "student";
+            }else if(hostString.startsWith("another.shpp.me")){
+                path = "another";
+            }else{                
+                let statusCode = 400;
+                let statusMessage = "Bad Request";
+                $headers = "Date: "+getCurrentDateFormatted()+"\n"+
+                "Server: Apache/2.2.14 (Win32)\n"+ 
+                "Content-Length: " + $body.toString().length+"\n"+                       
+                "Connection: Closed\n"+
+                "Content-Type: text/html; charset=utf-8\n"
+                ;
+                outputHttpResponse(statusCode, statusMessage, $headers,$body);
+                return;
             }
-            $headers = "Date: "+getCurrentDateFormatted()+"\n"+
-                        "Server: Apache/2.2.14 (Win32)\n"+
-                        "Content-Length: " + $body.length+"\n"+
-                        "Connection: Closed\n"+
-                        "Content-Type: text/html; charset=utf-8\n";
+            const fs = require("fs");
+
+            try {
+                const info = fs.readFileSync(path+$uri, "utf8");
+                
+                $body = info;
+            } catch (err) {
+                statusCode=400;
+                statusMessage = "File not fond";
+                $body = "file not found";
+            }           
         }
-       outputHttpResponse(statusCode, statusMessage, $headers,$method);
+        $headers = "Date: "+getCurrentDateFormatted()+"\n"+
+        "Server: Apache/2.2.14 (Win32)\n"+ 
+        "Content-Length: " + $body.toString().length+"\n"+                       
+        "Connection: Closed\n"+
+        "Content-Type: text/html; charset=utf-8\n"
+        ;
+       outputHttpResponse(statusCode, statusMessage, $headers,$body);
    }
    
    function parseTcpStringAsHttpRequest(string) { 
     let strings = string.split("\n");
+    strings = strings.filter(item => item.trim() !== "");
     let method = strings[0].split(' ')[0];
     let uri = strings[0].split(' ')[1];
-    let headers = strings.slice(1,-2);
-    let body = strings[strings.lenth-1];
+    let headers = strings.slice(1,strings.length-2);
+    let body = strings[strings.length-1];
   return { 
     method, 
     uri, 
