@@ -58,7 +58,7 @@ function readHttpLikeInput(){
        if($method!=="GET"){
             statusCode=400;
             statusMessage = "Bad Request";
-            $body = "not found";
+            $body = "not GET request";
        }else {
             let hostString = $headers.find(str => str.startsWith("Host")).replace("Host: ", "");
             let path="";
@@ -67,8 +67,8 @@ function readHttpLikeInput(){
             }else if(hostString.startsWith("another.shpp.me")){
                 path = "another";
             }else{                
-                let statusCode = 400;
-                let statusMessage = "Bad Request";
+                let statusCode = 403;
+                let statusMessage = "Not correct directory";
                 $headers = "Date: "+getCurrentDateFormatted()+"\n"+
                 "Server: Apache/2.2.14 (Win32)\n"+ 
                 "Content-Length: " + $body.toString().length+"\n"+                       
@@ -85,7 +85,7 @@ function readHttpLikeInput(){
                 
                 $body = info;
             } catch (err) {
-                statusCode=400;
+                statusCode=404;
                 statusMessage = "File not fond";
                 $body = "file not found";
             }           
